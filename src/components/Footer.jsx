@@ -1,69 +1,47 @@
-// src/components/Footer.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const Footer = () => {
+function ServiceCard({ icon, title, description, color, delay = 0 }) {
+  const navigate = useNavigate();
+
   return (
-    <footer className="bg-gray-800 text-white mt-12">
-      <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-b border-gray-700 pb-8">
-          
-          {/* Column 1: App Info */}
-          <div>
-            <h3 className="text-xl font-bold text-indigo-400 mb-4">SkillBridge</h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Bridging the gap between reliable blue-collar talent and service demand. Establishing structure, trust, and inclusivity.
-            </p>
-            <div className="flex space-x-4 text-gray-400">
-              {/* Mock Social Links */}
-              <a href="#" className="hover:text-white transition duration-200">FB</a>
-              <a href="#" className="hover:text-white transition duration-200">TW</a>
-              <a href="#" className="hover:text-white transition duration-200">LI</a>
-            </div>
-          </div>
+    <div 
+      className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 cursor-pointer overflow-hidden"
+      style={{
+        animation: `slideUp 0.6s ease-out ${delay}s both`,
+        borderTop: `4px solid ${color}`
+      }}
+      onClick={() => navigate('/search')}
+    >
+      {/* Background Gradient Effect */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+        style={{ background: `linear-gradient(135deg, ${color} 0%, transparent 100%)` }}
+      />
 
-          {/* Column 2: Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/search" className="text-gray-400 hover:text-white">Browse Services</Link></li>
-              <li><Link to="/signup?role=worker" className="text-gray-400 hover:text-white">Join as a Worker</Link></li>
-              <li><Link to="/jobs/post" className="text-gray-400 hover:text-white">Post a Job</Link></li>
-              <li><Link to="/about" className="text-gray-400 hover:text-white">About Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Trust & Safety (Crucial for SkillBridge) */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Trust & Safety</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/verification-process" className="text-gray-400 hover:text-white">Worker Verification</Link></li>
-              <li><Link to="/pricing-transparency" className="text-gray-400 hover:text-white">Pricing Transparency</Link></li>
-              <li><Link to="/dispute-resolution" className="text-gray-400 hover:text-white">Dispute Resolution</Link></li>
-              <li><Link to="/support" className="text-gray-400 hover:text-white">Support Center</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 4: Legal */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
-              <li><Link to="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
-              <li><Link to="/faq" className="text-gray-400 hover:text-white">FAQ</Link></li>
-            </ul>
-          </div>
+      {/* Content */}
+      <div className="relative z-10">
+        <div 
+          className="w-16 h-16 rounded-xl mb-4 flex items-center justify-center text-3xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+          style={{ backgroundColor: `${color}20` }}
+        >
+          {icon}
         </div>
-        
-        {/* Copyright Bar */}
-        <div className="mt-8 pt-4 border-t border-gray-700 text-center">
-          <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} SkillBridge. All rights reserved. Built for socioeconomic growth.
-          </p>
+        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors">
+          {title}
+        </h3>
+        <p className="text-gray-600 text-sm">
+          {description}
+        </p>
+        <div className="mt-4 flex items-center text-red-600 font-medium opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <span className="text-sm">Explore →</span>
         </div>
       </div>
-    </footer>
-  );
-};
 
-export default Footer;
+      {/* Hover Border Effect */}
+      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-red-500 to-red-600 group-hover:w-full transition-all duration-500" />
+    </div>
+  );
+}
+
+export default ServiceCard;

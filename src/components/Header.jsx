@@ -1,69 +1,190 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, User, LogOut, Briefcase } from 'lucide-react';
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
-const Header = () => {
-    // This state will be managed by an Auth Context later
-    const isAuthenticated = false; // Mock for now
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check authentication
+    setIsAuthenticated(localStorage.getItem('isAuthenticated') === 'true');
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    return (
-        <nav className="bg-white shadow-md sticky top-0 z-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    
-                    {/* Logo/App Name */}
-                    <div className="flex-shrink-0 flex items-center">
-                        <Link to="/" className="text-2xl font-bold text-indigo-700 hover:text-indigo-900 transition duration-150">
-                            SkillBridge
-                        </Link>
-                    </div>
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
+    navigate('/');
+  };
 
-                    {/* Desktop Navigation Links (Center) */}
-                    <div className="hidden sm:ml-6 sm:flex sm:space-x-8 items-center">
-                        <Link 
-                            to="/" 
-                            className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-indigo-500 transition duration-150"
-                        >
-                            Home
-                        </Link>
-                        <Link 
-                            to="/search" 
-                            className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-indigo-500 transition duration-150"
-                        >
-                            Browse Services
-                        </Link>
-                    </div>
+  return (
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white shadow-lg backdrop-blur-lg bg-opacity-95' 
+          : 'bg-white'
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link 
+            to="/" 
+            className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent hover:scale-105 transition-transform"
+          >
+            SkillBridge
+          </Link>
 
-                    {/* Auth Buttons/User Profile (Right) */}
-                    <div className="flex items-center">
-                        {isAuthenticated ? (
-                            <Link 
-                                to="/dashboard" 
-                                className="ml-4 p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition duration-150 font-medium"
-                            >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <div className="flex space-x-3">
-                                <Link 
-                                    to="/login" 
-                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150 py-2 px-3"
-                                >
-                                    Log In
-                                </Link>
-                                <Link 
-                                    to="/signup" 
-                                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-150 shadow-md"
-                                >
-                                    Sign Up
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
-};
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link 
+              to="/" 
+              className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+            >
+              Home
+            </Link>
+            <Link 
+              to="/search" 
+              className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+            >
+              Browse Services
+            </Link>
+            {isAuthenticated && (
+              <Link 
+                to="/dashboard" 
+                className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+              >
+                Dashboard
+              </Link>
+            )}
+          </nav>
+
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isAuthenticated ? (
+              <>
+                <Link 
+                  to="/dashboard/post-job"
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all transform hover:scale-105"
+                >
+                  <Briefcase size={18} />
+                  <span>Post Job</span>
+                </Link>
+                <Link 
+                  to="/dashboard/profile"
+                  className="p-2 text-gray-700 hover:text-red-600 transition-colors"
+                >
+                  <User size={24} />
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2 text-gray-700 hover:text-red-600 transition-colors"
+                >
+                  <LogOut size={24} />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+                >
+                  Log In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all transform hover:scale-105 shadow-lg"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-gray-700 hover:text-red-600 transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 space-y-4 animate-fadeIn">
+            <Link 
+              to="/" 
+              className="block text-gray-700 hover:text-red-600 transition-colors font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/search" 
+              className="block text-gray-700 hover:text-red-600 transition-colors font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Browse Services
+            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link 
+                  to="/dashboard" 
+                  className="block text-gray-700 hover:text-red-600 transition-colors font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/dashboard/post-job" 
+                  className="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Post Job
+                </Link>
+                <button 
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-gray-700 hover:text-red-600 transition-colors font-medium"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  className="block text-gray-700 hover:text-red-600 transition-colors font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Log In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
 
 export default Header;

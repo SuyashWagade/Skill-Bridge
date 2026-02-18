@@ -1,130 +1,302 @@
-// src/pages/HomePage.jsx
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, Briefcase, UserCircle } from 'lucide-react';
 
-// Mock data for the category grid
-const categories = [
-    { name: 'Plumbing & Repair', icon: '🔧', color: 'bg-blue-100', skill: 'Plumbing' },
-    { name: 'Electrical Work', icon: '⚡', color: 'bg-yellow-100', skill: 'Electrician' },
-    { name: 'Home Cleaning', icon: '🧼', color: 'bg-green-100', skill: 'Cleaning' },
-    { name: 'Carpentry & Renovation', icon: '🔨', color: 'bg-red-100', skill: 'Carpentry' },
-    { name: 'Driver & Delivery', icon: '🚚', color: 'bg-purple-100', skill: 'Delivery' },
-    { name: 'Automotive Repair', icon: '🚗', color: 'bg-indigo-100', skill: 'Mechanic' },
-    { name: 'Gardening & Landscaping', icon: '🌳', color: 'bg-lime-100', skill: 'Gardening' },
-    { name: 'Security & Helper', icon: '🛡️', color: 'bg-orange-100', skill: 'Security Guard' },
-];
+function SignupPage() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [role, setRole] = useState('worker'); // 'worker' or 'employer'
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [errors, setErrors] = useState({});
 
-const HomePage = () => {
-    const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: ''
+      });
+    }
+  };
 
-    // Handles the form submission for the main search bar
-    const handleSearch = (event) => {
-        event.preventDefault();
-        const searchTerm = event.target.elements.search.value;
-        // Navigate to the search results page with the query
-        if (searchTerm) {
-            navigate(`/search?query=${searchTerm}`);
-        }
-    };
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.fullName) {
+      newErrors.fullName = 'Full name is required';
+    }
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    return newErrors;
+  };
 
-    // Handles click on a category card
-    const handleCategoryClick = (skill) => {
-        // Navigate to the search results page filtered by the specific skill
-        navigate(`/search?skill=${skill}`);
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newErrors = validateForm();
+    
+    if (Object.keys(newErrors).length === 0) {
+      // Simulate signup
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('userName', formData.fullName);
+      localStorage.setItem('userRole', role);
+      navigate('/dashboard');
+    } else {
+      setErrors(newErrors);
+    }
+  };
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* 1. Hero Section and Search Bar */}
-            <header className="bg-gradient-to-r from-blue-600 to-indigo-700 py-20 shadow-lg">
-                <div className="max-w-4xl mx-auto text-center px-4">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-                        SkillBridge: Bridging Blue-Collar Talent
-                    </h1>
-                    <p className="text-xl text-blue-200 mb-8">
-                        Find verified, local workers for any service, or find your next reliable job.
-                    </p>
-                    
-                    {/* The main search form */}
-                    <form onSubmit={handleSearch} className="flex bg-white rounded-lg shadow-xl p-2 max-w-xl mx-auto">
-                        <input
-                            type="text"
-                            name="search"
-                            placeholder="Search for skills (e.g., Electrician, Maid Service, Plumber)"
-                            className="flex-grow p-3 text-gray-700 rounded-l-lg focus:outline-none"
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-r-lg transition duration-300 flex items-center justify-center"
-                        >
-                            <span className="mr-2">🔎</span> Find Services
-                        </button>
-                    </form>
-                </div>
-            </header>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 flex items-center justify-center px-4 py-12">
+      <div className="max-w-2xl w-full">
+        {/* Back Button */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center space-x-2 text-gray-600 hover:text-red-600 mb-8 transition-colors"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Home</span>
+        </Link>
 
-            <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        {/* Signup Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 animate-fadeIn">
+          {/* Logo/Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-2">
+              Join SkillBridge
+            </h1>
+            <p className="text-gray-600">Create your account and get started</p>
+          </div>
 
-                {/* 2. Featured Categories Section */}
-                <section className="mb-16">
-                    <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
-                        Popular Categories
-                    </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                        {categories.map((category) => (
-                            <div
-                                key={category.name}
-                                onClick={() => handleCategoryClick(category.skill)}
-                                className={`p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${category.color} border-b-4 border-gray-300 flex flex-col items-center text-center`}
-                            >
-                                <p className="text-4xl mb-3">{category.icon}</p>
-                                <h3 className="text-lg font-semibold text-gray-800">{category.name}</h3>
-                                <p className="text-sm text-gray-600">Find jobs or workers.</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+          {/* Role Selection */}
+          <div className="mb-8">
+            <p className="text-gray-700 font-medium mb-4 text-center">I want to:</p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setRole('worker')}
+                className={`p-6 rounded-xl border-2 transition-all ${
+                  role === 'worker'
+                    ? 'border-red-600 bg-red-50'
+                    : 'border-gray-200 hover:border-red-300'
+                }`}
+              >
+                <UserCircle className={`mx-auto mb-3 ${role === 'worker' ? 'text-red-600' : 'text-gray-400'}`} size={40} />
+                <h3 className={`font-bold mb-1 ${role === 'worker' ? 'text-red-600' : 'text-gray-700'}`}>
+                  Find Work
+                </h3>
+                <p className="text-sm text-gray-600">I'm a skilled worker looking for jobs</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('employer')}
+                className={`p-6 rounded-xl border-2 transition-all ${
+                  role === 'employer'
+                    ? 'border-red-600 bg-red-50'
+                    : 'border-gray-200 hover:border-red-300'
+                }`}
+              >
+                <Briefcase className={`mx-auto mb-3 ${role === 'employer' ? 'text-red-600' : 'text-gray-400'}`} size={40} />
+                <h3 className={`font-bold mb-1 ${role === 'employer' ? 'text-red-600' : 'text-gray-700'}`}>
+                  Hire Workers
+                </h3>
+                <p className="text-sm text-gray-600">I need to hire skilled workers</p>
+              </button>
+            </div>
+          </div>
 
-                {/* 3. Call to Action / Trust Section */}
-                <section className="grid md:grid-cols-2 gap-8 mt-16">
-                    
-                    {/* Worker CTA: Focusing on Structure and Trust */}
-                    <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-green-500">
-                        <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                           <span className="text-3xl mr-3 text-green-600">💪</span> I am a Worker
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                            Establish **trust** and **structure**! Create a verified profile, get access to local jobs, and manage your earnings reliably. Join the movement to formalize the blue-collar market.
-                        </p>
-                        <button 
-                            onClick={() => navigate('/signup?role=worker')}
-                            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
-                        >
-                            Start Earning Today
-                        </button>
-                    </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Full Name */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    errors.fullName 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : 'border-gray-200 focus:border-red-500'
+                  }`}
+                  placeholder="John Doe"
+                />
+              </div>
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+              )}
+            </div>
 
-                    {/* Client CTA: Focusing on Verified Services */}
-                    <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-indigo-500">
-                        <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                            <span className="text-3xl mr-3 text-indigo-600">🤝</span> I need a Service
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                            Find **verified, local talent** quickly. View transparent ratings, check prices, and hire with confidence. Post a job for free and get matched instantly.
-                        </p>
-                        <button
-                            onClick={() => navigate('/signup?role=client')}
-                            className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
-                        >
-                            Post a Job Now
-                        </button>
-                    </div>
-                </section>
+            {/* Email */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    errors.email 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : 'border-gray-200 focus:border-red-500'
+                  }`}
+                  placeholder="your@email.com"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
 
-            </main>
+            {/* Password */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    errors.password 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : 'border-gray-200 focus:border-red-500'
+                  }`}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
+                    errors.confirmPassword 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : 'border-gray-200 focus:border-red-500'
+                  }`}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            {/* Terms */}
+            <div>
+              <label className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  className="w-4 h-4 mt-1 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                />
+                <span className="text-gray-600 text-sm">
+                  I agree to the{' '}
+                  <a href="#" className="text-red-600 hover:underline">Terms of Service</a>
+                  {' '}and{' '}
+                  <a href="#" className="text-red-600 hover:underline">Privacy Policy</a>
+                </span>
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105 shadow-lg"
+            >
+              Create Account
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">Or sign up with</span>
+            </div>
+          </div>
+
+          {/* Social Signup */}
+          <div className="grid grid-cols-2 gap-4">
+            <button className="py-3 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all font-medium text-gray-700">
+              🔍 Google
+            </button>
+            <button className="py-3 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all font-medium text-gray-700">
+              📘 Facebook
+            </button>
+          </div>
+
+          {/* Login Link */}
+          <p className="text-center text-gray-600 mt-6">
+            Already have an account?{' '}
+            <Link to="/login" className="text-red-600 hover:text-red-700 font-medium">
+              Sign in
+            </Link>
+          </p>
         </div>
-    );
-};
+      </div>
+    </div>
+  );
+}
 
-export default HomePage;
+export default SignupPage;
